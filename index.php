@@ -1,26 +1,26 @@
 <?php
 
 require 'vendor/autoload.php';
-use Dotenv\Dotenv;
 use Telegram\Bot\Api;
 
-// Load environment variables
-$dotenv = Dotenv::createImmutable(__DIR__);
-$dotenv->load();
-
-// Get environment variables
+// Get environment variables directly (no need for .env file)
 $telegramApiKey = getenv('TELEGRAM_BOT_API_KEY');
-$shortenerApiKey = getenv('URL_SHORTENER_API_KEY'); // Unused here as we use proxy
+
+// If the API key is missing, handle the error
+if (!$telegramApiKey) {
+    die("Error: TELEGRAM_BOT_API_KEY is not set.");
+}
 
 // Instantiate Telegram API
 $telegram = new Api($telegramApiKey);
 
-// Send a welcome message when the bot is first started (i.e., user starts a chat with the bot)
-$telegram->commandsHandler(true); // Automatically handle "/start" command
-$telegram->sendMessage([
-    'chat_id' => $chatId,
-    'text' => "Hello! I'm your URL Shortener bot. I can shorten URLs that you send me or those in forwarded messages. Just send me a URL, or forward a message with a link, and I'll shorten it for you. For more features, check out [Trimd](https://trimd.cc)."
-]);
+// Define a function to send a welcome message
+function sendWelcomeMessage($telegram, $chatId) {
+    $telegram->sendMessage([
+        'chat_id' => $chatId,
+        'text' => "Hello! I'm your URL Shortener bot. I can shorten URLs that you send me or those in forwarded messages. Just send me a URL, or forward a message with a link, and I'll shorten it for you. For more features, check out [Trimd](https://trimd.cc)."
+    ]);
+}
 
 // Check for updates (messages from users)
 $updates = $telegram->getUpdates();
@@ -30,6 +30,11 @@ foreach ($updates as $update) {
     $chatId = $message->getChat()->getId();
     $text = $message->getText();
     $forwarded = $message->getForwardFrom();
+
+    // If it's the first time the bot is receiving a message, send the welcome message
+    if ($message->isCommand() && $message->getText() == "/start") {
+        sendWelcomeMessage($telegram, $chatId);
+    }
 
     if ($message->hasText()) {
         if (filter_var($text, FILTER_VALIDATE_URL)) {

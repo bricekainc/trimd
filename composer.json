@@ -4,9 +4,15 @@
   "type": "project",
   "require": {
     "php": ">=7.4",
-    "php-telegram-bot/core": "^0.71",
+    "php-telegram-bot/core": "^0.71", 
     "vlucas/phpdotenv": "^5.3"
   },
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/php-telegram-bot/core"
+    }
+  ],
   "autoload": {
     "psr-4": {
       "BricekaInc\\Trimd\\": "src/"
@@ -16,5 +22,7 @@
     "post-install-cmd": [
       "php -r \"file_exists('.env') || copy('.env.example', '.env');\""
     ]
-  }
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
 }

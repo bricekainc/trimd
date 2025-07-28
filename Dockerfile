@@ -1,26 +1,30 @@
-# Use PHP 8.0 as the base image
-FROM php:8.0-apache
+# Use official PHP image as base
+FROM php:8.1-apache
 
-# Set the working directory inside the container
-WORKDIR /var/www/html
+# Install system dependencies (e.g., git, libpng, etc.)
+RUN apt-get update && apt-get install -y \
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
+    git \
+    zlib1g-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install gd
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y libpng-dev libjpeg-dev libfreetype6-dev && rm -rf /var/lib/apt/lists/*
-
-# Enable Apache rewrite module
-RUN a2enmod rewrite
-
-# Install Composer (dependency manager)
+# Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Copy your code into the container
+# Set working directory
+WORKDIR /var/www/html
+
+# Copy project files into the container
 COPY . /var/www/html/
 
-# Install PHP dependencies using Composer
-RUN composer install
+# Clear cache and install PHP dependencies using Composer
+RUN composer clear-cache && composer install --verbose --no-interaction --optimize-autoloader --no-scripts
 
-# Expose port 80 for the web server
+# Expose port 80 for Apache
 EXPOSE 80
 
-# Start Apache server
+# Start Apache
 CMD ["apache2-foreground"]

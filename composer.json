@@ -1,0 +1,20 @@
+{
+  "name": "bricekainc/trimd",
+  "description": "A Telegram bot to shorten URLs and replace links in forwarded messages.",
+  "type": "project",
+  "require": {
+    "php": ">=7.4",
+    "php-telegram-bot/core": "^0.71",
+    "vlucas/phpdotenv": "^5.3"
+  },
+  "autoload": {
+    "psr-4": {
+      "BricekaInc\\Trimd\\": "src/"
+    }
+  },
+  "scripts": {
+    "post-install-cmd": [
+      "php -r \"file_exists('.env') || copy('.env.example', '.env');\""
+    ]
+  }
+}

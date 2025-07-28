@@ -4,7 +4,7 @@
   "type": "project",
   "require": {
     "php": ">=7.4",
-    "php-telegram-bot/core": "^0.71", 
+    "longman/telegram-bot": "^0.71", 
     "vlucas/phpdotenv": "^5.3"
   },
   "repositories": [

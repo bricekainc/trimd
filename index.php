@@ -15,6 +15,13 @@ $shortenerApiKey = getenv('URL_SHORTENER_API_KEY'); // Unused here as we use pro
 // Instantiate Telegram API
 $telegram = new Api($telegramApiKey);
 
+// Send a welcome message when the bot is first started (i.e., user starts a chat with the bot)
+$telegram->commandsHandler(true); // Automatically handle "/start" command
+$telegram->sendMessage([
+    'chat_id' => $chatId,
+    'text' => "Hello! I'm your URL Shortener bot. I can shorten URLs that you send me or those in forwarded messages. Just send me a URL, or forward a message with a link, and I'll shorten it for you. For more features, check out [Trimd](https://trimd.cc)."
+]);
+
 // Check for updates (messages from users)
 $updates = $telegram->getUpdates();
 
@@ -35,10 +42,23 @@ foreach ($updates as $update) {
         } elseif ($forwarded) {
             // Forwarded message with URLs, shorten them
             $links = extractUrls($text);
-            $shortenedText = replaceUrlsWithShortened($text, $links);
+            if (empty($links)) {
+                $telegram->sendMessage([
+                    'chat_id' => $chatId,
+                    'text' => "I couldn't detect any links in this forwarded message. Please forward a message containing a link, or send me a link directly."
+                ]);
+            } else {
+                $shortenedText = replaceUrlsWithShortened($text, $links);
+                $telegram->sendMessage([
+                    'chat_id' => $chatId,
+                    'text' => $shortenedText
+                ]);
+            }
+        } else {
+            // No valid link found in the user's message
             $telegram->sendMessage([
                 'chat_id' => $chatId,
-                'text' => $shortenedText
+                'text' => "I couldn't detect a link in your message. Please send a link or forward a message containing a link, and I'll shorten it for you. Also, check out [Trimd](https://trimd.cc) for more features!"
             ]);
         }
     }
@@ -84,4 +104,5 @@ function shortenUrl($url) {
 
     return $data['data']['shorturl'] ?? $url; // Return shortened URL or original if an error occurs
 }
+
 ?>

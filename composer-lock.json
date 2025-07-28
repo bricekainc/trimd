@@ -1,20 +1,31 @@
 {
-  "name": "adlinkbot",
-  "version": "1.0.0",
-  "lockfileVersion": 3,
-  "requires": true,
-  "packages": {
-    "": {
-      "name": "adlinkbot",
-      "version": "1.0.0",
-      "license": "ISC",
-      "dependencies": {
-        "axios": "^1.7.9",
-        "express": "^4.21.2",
-        "fs": "^0.0.1-security",
-        "node-telegram-bot-api": "^0.66.0"
-      }
-    },
+  "name": "bricekainc/trimd",
+  "description": "A Telegram bot to shorten URLs and replace links in forwarded messages.",
+  "type": "project",
+  "require": {
+    "php": ">=7.4",
+    "php-telegram-bot/core": "^0.71", 
+    "vlucas/phpdotenv": "^5.3"
+  },
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/php-telegram-bot/core"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "BricekaInc\\Trimd\\": "src/"
+    }
+  },
+  "scripts": {
+    "post-install-cmd": [
+      "php -r \"file_exists('.env') || copy('.env.example', '.env');\""
+    ]
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
+},
     "node_modules/@cypress/request": {
       "version": "3.0.7",
       "resolved": "https://registry.npmjs.org/@cypress/request/-/request-3.0.7.tgz",

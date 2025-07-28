@@ -1,25 +1,25 @@
 <?php
 namespace BricekaInc\Trimd;
 
-use Telegram\Bot\Api;
+class UrlShortener {
+    // Function to shorten a URL
+    public function shortenUrl($url) {
+        $proxyUrl = "https://corsproxy.io/?https://trimd.cc/shorten";
+        $body = new URLSearchParams();
+        $body->append('url', $url);
+        
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $proxyUrl);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $body->toString());
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HEADER, false);
+        
+        $response = curl_exec($ch);
+        curl_close($ch);
 
-class TelegramBot {
-    protected $telegram;
+        $data = json_decode($response, true);
 
-    public function __construct($apiKey) {
-        $this->telegram = new Api($apiKey);
-    }
-
-    // Function to send a message to a user
-    public function sendMessage($chatId, $message) {
-        $this->telegram->sendMessage([
-            'chat_id' => $chatId,
-            'text' => $message
-        ]);
-    }
-
-    // Function to get updates (messages)
-    public function getUpdates() {
-        return $this->telegram->getUpdates();
+        return $data['data']['shorturl'] ?? $url;
     }
 }

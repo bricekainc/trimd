@@ -37,6 +37,6 @@ Paste → Shorten → Copy → Share.
 ```html
 <iframe
   src="https://trimd.cc/embed"
-  style="width:100%;height:120px;border:0;border-radius:8px;"
+  style="width:100%;height:200px;border:0;border-radius:8px;"
   loading="lazy"
 ></iframe>

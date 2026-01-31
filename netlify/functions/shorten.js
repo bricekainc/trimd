@@ -1,7 +1,23 @@
 export async function handler(event) {
+  // CORS preflight
+  if (event.httpMethod === 'OPTIONS') {
+    return {
+      statusCode: 200,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type'
+      },
+      body: ''
+    };
+  }
+
   if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,
+      headers: {
+        'Access-Control-Allow-Origin': '*'
+      },
       body: 'Method Not Allowed'
     };
   }
@@ -11,6 +27,9 @@ export async function handler(event) {
   if (!url) {
     return {
       statusCode: 400,
+      headers: {
+        'Access-Control-Allow-Origin': '*'
+      },
       body: JSON.stringify({ error: true, message: 'Missing URL' })
     };
   }

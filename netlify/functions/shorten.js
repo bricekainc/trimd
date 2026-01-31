@@ -1,5 +1,4 @@
 export async function handler(event) {
-  // CORS preflight
   if (event.httpMethod === 'OPTIONS') {
     return {
       statusCode: 200,
@@ -15,41 +14,36 @@ export async function handler(event) {
   if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,
-      headers: {
-        'Access-Control-Allow-Origin': '*'
-      },
+      headers: { 'Access-Control-Allow-Origin': '*' },
       body: 'Method Not Allowed'
     };
   }
 
-  const { url } = JSON.parse(event.body || '{}');
+  let body = {};
+  try {
+    body = JSON.parse(event.body);
+  } catch (e) {}
 
+  const { url } = body;
   if (!url) {
     return {
       statusCode: 400,
-      headers: {
-        'Access-Control-Allow-Origin': '*'
-      },
+      headers: { 'Access-Control-Allow-Origin': '*' },
       body: JSON.stringify({ error: true, message: 'Missing URL' })
     };
   }
 
-  const response = await fetch('https://trimd.cc/shorten', {
+  const res = await fetch('https://trimd.cc/shorten', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded'
-    },
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: new URLSearchParams({ url })
   });
 
-  const text = await response.text();
+  const data = await res.text();
 
   return {
     statusCode: 200,
-    headers: {
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*'
-    },
-    body: text
+    headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+    body: data
   };
 }

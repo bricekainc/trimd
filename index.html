@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Link Shortener</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      background: #f5f7fa;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+    .card {
+      background: #fff;
+      padding: 24px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,.08);
+      max-width: 520px;
+      width: 100%;
+    }
+    h1 {
+      margin: 0 0 16px;
+      font-size: 22px;
+    }
+    form {
+      display: flex;
+      gap: 8px;
+    }
+    input {
+      flex: 1;
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    button {
+      padding: 12px 18px;
+      font-size: 16px;
+      border-radius: 6px;
+      border: none;
+      background: #2563eb;
+      color: #fff;
+      cursor: pointer;
+    }
+    .result {
+      margin-top: 16px;
+      padding: 12px;
+      background: #f1f5f9;
+      border-radius: 6px;
+      display: none;
+      word-break: break-all;
+    }
+    a {
+      color: #2563eb;
+      text-decoration: none;
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Shorten a URL</h1>
+
+    <form id="form">
+      <input id="url" placeholder="Paste a long URL" required />
+      <button type="submit">Shorten</button>
+    </form>
+
+    <div class="result" id="result"></div>
+  </div>
+
+  <script>
+    const form = document.getElementById('form');
+    const result = document.getElementById('result');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const url = document.getElementById('url').value.trim();
+      if (!url) return;
+
+      result.style.display = 'block';
+      result.textContent = 'Shortening…';
+
+      try {
+        const res = await fetch('/.netlify/functions/shorten', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url })
+        });
+
+        const data = await res.json();
+
+        if (data.error === false && data.data?.shorturl) {
+          result.innerHTML = `Short URL: <a href="${data.data.shorturl}" target="_blank">${data.data.shorturl}</a>`;
+        } else {
+          result.textContent = 'Failed to shorten URL.';
+        }
+      } catch {
+        result.textContent = 'Network error.';
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,109 +1,533 @@
+<?php
+require_once 'config.php';
+
+// Fetch Data for Tables
+function getLinks($pdo, $order, $limit = 10) {
+$stmt = $pdo->prepare("SELECT alias, url, click, date FROM url WHERE public = 1 AND archived = 0 ORDER BY $order LIMIT $limit");
+$stmt->execute();
+return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+$topLinks = getLinks($pdo, 'click DESC');
+$newLinks = getLinks($pdo, 'date DESC');
+$inactive = getLinks($pdo, 'click ASC');
+?>
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Link Shortener</title>
-  <style>
-    body {
-      font-family: system-ui, sans-serif;
-      background: #f5f7fa;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      margin: 0;
-    }
-    .card {
-      background: #fff;
-      padding: 24px;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0,0,0,.08);
-      max-width: 520px;
-      width: 100%;
-    }
-    h1 {
-      margin: 0 0 16px;
-      font-size: 22px;
-    }
-    form {
-      display: flex;
-      gap: 8px;
-    }
-    input {
-      flex: 1;
-      padding: 12px;
-      font-size: 16px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-    }
-    button {
-      padding: 12px 18px;
-      font-size: 16px;
-      border-radius: 6px;
-      border: none;
-      background: #2563eb;
-      color: #fff;
-      cursor: pointer;
-    }
-    .result {
-      margin-top: 16px;
-      padding: 12px;
-      background: #f1f5f9;
-      border-radius: 6px;
-      display: none;
-      word-break: break-all;
-    }
-    a {
-      color: #2563eb;
-      text-decoration: none;
-      font-weight: 500;
-    }
-  </style>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>Free URL Shortener – Shorten Links Instantly | trimd.cc  | Fast & Secure URL Shortener</title>
+
+<meta name="description" content="Trimd.cc is a fast and free URL shortener that lets you shorten links instantly, create short URLs, generate QR codes, and manage link campaigns with powerful analytics.">
+
+<meta name="keywords" content="url shortener, free url shortener, shorten link free, tiny url generator, short link creator, create short url, link shortener tool, trimd">
+
+<meta name="robots" content="index,follow">
+
+<link rel="canonical" href="https://briceka.com/trimd">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="Free URL Shortener – Shorten Links Instantly">
+<meta property="og:description" content="Shorten long links instantly with Trimd.cc free URL shortener. Create short links, QR codes and track link performance.">
+<meta property="og:url" content="https://briceka.com/trimd">
+<meta property="og:image" content="https://briceka.com/tools/trimd/trimd.png">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Free URL Shortener – Shorten Links Instantly">
+<meta name="twitter:description" content="Fast free URL shortener for creating short links instantly.">
+<meta name="twitter:image" content="https://briceka.com/tools/trimd/trimd.png">
+
+<link rel="icon" href="https://briceka.com/tools/trimd/trimd.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link rel="preload" href="https://fonts.gstatic.com/s/orbitron/v31/yMJRMIlzdpvBhQQL_Qq7dyw.woff2" as="font" type="font/woff2" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+
+:root{
+--bg:#0a0e17;
+--bg-darker:#06080f;
+--text:#e2e8f0;
+--text-dim:#94a3b8;
+--primary:#00f0ff;
+--border:#1e293b;
+--glass:rgba(15,23,42,0.7);
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+
+body{
+background:var(--bg);
+color:var(--text);
+font-family:'Roboto Mono',monospace,system-ui;
+line-height:1.6;
+overflow-x:hidden;
+}
+
+header{
+padding:1.5rem 5%;
+border-bottom:1px solid var(--border);
+display:flex;
+align-items:center;
+}
+
+.logo-main{
+height:28px
+}
+
+main{
+padding:3rem 5%;
+max-width:1100px;
+margin:auto;
+text-align:center
+}
+
+h1{
+font-family:'Orbitron',sans-serif;
+font-size:clamp(2.4rem,7vw,4.2rem);
+margin-bottom:1rem;
+background:linear-gradient(to bottom,#fff,var(--primary));
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+}
+
+.subtitle{
+font-size:1.1rem;
+color:var(--text-dim);
+max-width:760px;
+margin:auto auto 3rem
+}
+
+.app-container{
+border:1px solid var(--border);
+border-radius:14px;
+overflow:hidden;
+margin-bottom:4rem
+}
+
+.app-header{
+background:#111827;
+padding:10px 16px;
+display:flex;
+gap:8px;
+align-items:center;
+border-bottom:1px solid var(--border)
+}
+
+.dot{
+width:10px;
+height:10px;
+border-radius:50%;
+background:#334155
+}
+
+.dot.active{
+background:var(--primary)
+}
+
+#trimd-embed{
+width:100%;
+height:420px;
+border:0
+}
+
+.section{
+margin:4rem 0;
+text-align:left
+}
+
+h2{
+font-family:'Orbitron';
+color:var(--primary);
+margin-bottom:1rem
+}
+
+.features-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+gap:1rem
+}
+
+.feature{
+background:var(--glass);
+border:1px solid var(--border);
+padding:1.3rem;
+border-radius:10px
+}
+
+.feature h3{
+color:var(--primary);
+font-size:.9rem;
+margin-bottom:.4rem
+}
+
+.feature p{
+color:var(--text-dim);
+font-size:.9rem
+}
+
+.faq .card{
+background:#111827;
+border:1px solid var(--border);
+margin-bottom:10px;
+border-radius:8px
+}
+
+.faq button{
+width:100%;
+background:none;
+border:0;
+color:#fff;
+padding:1rem;
+text-align:left;
+cursor:pointer;
+display:flex;
+justify-content:space-between
+}
+
+.toggle_body{
+display:none;
+padding:1rem;
+color:var(--text-dim);
+border-top:1px solid var(--border)
+}
+
+.show .toggle_body{
+display:block
+}
+
+footer{
+border-top:1px solid var(--border);
+padding:3rem 5%;
+text-align:center;
+color:var(--text-dim);
+font-size:.85rem
+}
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f172a; color: #f8fafc; }
+.glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.05); }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+.gradient-text { background: linear-gradient(90deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+</style>
+
 </head>
+
 <body>
-  <div class="card">
-    <h1>Shorten a URL</h1>
 
-    <form id="form">
-      <input id="url" placeholder="Paste a long URL" required />
-      <button type="submit">Shorten</button>
-    </form>
+<header>
+<a href="/trimd/">
+<img src="https://briceka.com/tools/trimd/trimd.png" alt="Trimd URL Shortener" class="logo-main">
+</a>
+</header>
 
-    <div class="result" id="result"></div>
-  </div>
+<main>
 
-  <script>
-    const form = document.getElementById('form');
-    const result = document.getElementById('result');
+<h1>Simple and fast Free URL Shortener</h1>
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
+<p class="subtitle">
+The ultimate free tool to shorten URLs and generate short links. URL shortener allows to create a shortened link making it easy to share. Trimd.cc is a fast and free URL shortener that helps you shorten links instantly. Convert long URLs into short links, share them anywhere, and track clicks using powerful analytics tools.
+</p>
 
-      const url = document.getElementById('url').value.trim();
-      if (!url) return;
+<div class="max-w-3xl mx-auto mt-10">
+<div class="glass p-2 rounded-3xl flex flex-col md:flex-row gap-2 shadow-2xl">
+<input type="url" id="longUrl" placeholder="Enter your long URL here..." class="flex-1 bg-transparent px-6 py-4 outline-none text-white text-lg">
+<button onclick="shortenLink()" id="btnText" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-10 py-4 rounded-2xl transition-all flex items-center justify-center gap-2">
+Shorten <i data-lucide="zap" class="w-5 h-5"></i>
+</button>
+</div>
+<div id="resultArea" class="hidden mt-6 animate-bounce">
+<div class="glass p-4 rounded-2xl border-blue-500/30 flex items-center justify-between">
+<span id="shortResult" class="text-blue-400 font-bold truncate"></span>
+<button onclick="copyResult()" class="ml-4 text-slate-300 hover:text-white"><i data-lucide="copy"></i></button>
+</div>
+</div>
+<div id="notify" class="hidden mt-4">
+<div id="notifyText" class="glass p-3 rounded-xl text-sm"></div>
+</div>
+</div>
+ 
+<div class="app-container">
 
-      result.style.display = 'block';
-      result.textContent = 'Shortening…';
+<div class="app-header">
+<div class="dot active"></div>
+<div class="dot"></div>
+<div class="dot"></div>
+<span style="font-size:12px;color:#94a3b8;margin-left:10px">Trimd Terminal // free URL shortener</span>
+</div>
 
-      try {
-        const res = await fetch('/.netlify/functions/shorten', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ url })
-        });
+<iframe id="trimd-embed" src="https://s.trimd.cc/" loading="eager" allow="clipboard-write"></iframe>
 
-        const data = await res.json();
+</div>
 
-        if (data.error === false && data.data?.shorturl) {
-          result.innerHTML = `Short URL: <a href="${data.data.shorturl}" target="_blank">${data.data.shorturl}</a>`;
-        } else {
-          result.textContent = 'Failed to shorten URL.';
-        }
-      } catch {
-        result.textContent = 'Network error.';
-      }
-    });
-  </script>
+
+<section class="max-w-5xl mx-auto px-6 py-12">
+<div class="grid md:grid-cols-2 gap-12 items-center mb-20">
+<div>
+<h2 class="text-3xl font-bold mb-4">How to shorten a URL?</h2>
+<ol class="space-y-4 text-slate-400">
+<li class="flex gap-3"><span class="bg-blue-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs">1</span> Copy your long URL from the browser address bar.</li>
+<li class="flex gap-3"><span class="bg-blue-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs">2</span> Paste it into the input field at the top of this page.</li>
+<li class="flex gap-3"><span class="bg-blue-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs">3</span> Click "Shorten" and wait for your instant, tiny link to appear.</li>
+</ol>
+</div>
+<div class="glass p-8 rounded-3xl">
+<h3 class="text-xl font-bold mb-2">Why use <?php echo $config['site_name']; ?>?</h3>
+<p class="text-slate-400 text-sm leading-relaxed">
+Our platform provides more than just a shorter link. We offer enterprise-grade redirection speeds, ensuring your users reach their destination without delay. Long, messy URLs can look suspicious and lower click-through rates. By using a clean, professional link, you increase trust and engagement across social media platforms like Instagram, Twitter, and LinkedIn.
+</p>
+</div>
+</div>
+
+<div class="mb-12">
+<h2 class="text-xl font-bold mb-2">Our Statistics</h2>
+<div class="flex gap-4 mb-6 overflow-x-auto pb-2">
+<button onclick="switchTab('top')" class="tab-btn active bg-blue-600 px-6 py-2 rounded-full text-sm font-bold">🔥 Top Visited</button>
+<button onclick="switchTab('new')" class="tab-btn bg-slate-800 px-6 py-2 rounded-full text-sm font-bold hover:bg-slate-700">✨ Newest</button>
+<button onclick="switchTab('inactive')" class="tab-btn bg-slate-800 px-6 py-2 rounded-full text-sm font-bold hover:bg-slate-700">💤 Inactive</button>
+</div>
+
+<div class="glass rounded-3xl overflow-hidden shadow-xl">
+<?php foreach (['top' => $topLinks, 'new' => $newLinks, 'inactive' => $inactive] as $id => $data): ?>
+<div id="<?php echo $id; ?>" class="tab-content <?php echo $id === 'top' ? 'active' : ''; ?>">
+<table class="w-full text-left border-collapse">
+<thead class="bg-slate-800/50">
+<tr>
+<th class="p-4 text-xs font-bold uppercase text-slate-500">Short Link</th>
+<th class="p-4 text-xs font-bold uppercase text-slate-500 hidden md:table-cell">Clicks</th>
+<th class="p-4 text-xs font-bold uppercase text-slate-500 text-right">Date</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-800">
+<?php foreach ($data as $link): ?>
+<tr class="hover:bg-slate-800/30 transition-colors">
+<td class="p-4"><a href="<?php echo $config['site_url'].'/'.$link['alias']; ?>" target="_blank" class="text-blue-400 hover:underline">/<?php echo $link['alias']; ?></a></td>
+<td class="p-4 hidden md:table-cell"><span class="bg-slate-700 px-2 py-1 rounded text-xs"><?php echo number_format($link['click']); ?></span></td>
+<td class="p-4 text-right text-xs text-slate-500"><?php echo date('M d, Y', strtotime($link['date'])); ?></td>
+</tr>
+<?php endforeach; ?>
+</tbody>
+</table>
+</div>
+<?php endforeach; ?>
+</div>
+</div>
+
+<div class="prose prose-invert max-w-none text-slate-400 space-y-6 mt-20">
+<h3 class="text-white">Enhance Your Digital Strategy with Smart URL Management</h3>
+<p>Free URL shortener is a tool to shorten a long link and create a short URL easy to share on sites, chat and emails. Track short URL traffic and manage your links. A fast, easy, and free link shortener. Use this free URL shortener to change long, ugly links into memorable and trackable short URLs.</p>
+<p>Search engines and social algorithms prioritize user experience. Shorter links are easier to crawl, share, and remember. Whether you are running an affiliate marketing campaign or simply sharing a personal project, our system ensures that your links are always active and lightning-fast. With built-in tracking for clicks, you can monitor the performance of your shared content in real-time through your administrative dashboard.</p>
+<p>Our infrastructure is designed for speed. We minimize external calls and use localized scripts to ensure that your landing page loads instantly on both mobile and desktop devices. This 100% responsive design ensures that whether your visitors are on an iPhone or a workstation, they get the same beautiful experience.</p>
+</div>
+
+<div class="prose prose-invert max-w-none text-slate-400 space-y-6 mt-20">
+<h3 class="text-white">Shorten, share and track</h3>
+<p>This Free URL Shortener allows to shorten long links from Instagram, Facebook, YouTube, Twitter, Linked In, WhatsApp, TikTok, blogs and any domain name. Just paste the long URL and click the Shorten URL button. On the next page, copy the shortened URL and share it on sites, chat and emails. After shortening the URL, check how many clicks it received.</p>
+<p>The free url shortener is easy and fast, enter the long link to get your shortened link. Use any link, no matter what size, ShortURL always shortens. It is fast and secure, our service has HTTPS protocol and data encryption. Check the number of clicks that your shortened URL received. All links that try to disseminate spam, viruses and malware are deleted. Compatible with smartphones, tablets and desktop.</p>
+<p>Your shortened URLs can be used in publications, documents, advertisements, blogs, forums, instant messages, and other locations. Track statistics for your business and projects by monitoring the number of hits from your URL with our click counter.</p>
+</div>
+</section>
+
+
+<section class="section">
+
+<h2>More than just a URL shortener</h2>
+
+<p>
+Trimd is more than a simple link shortener. Our platform allows you to shorten links, generate QR codes, build bio pages, and analyze traffic from every short URL you create.
+</p>
+
+<div class="features-grid">
+
+<div class="feature"><h3>Shorten Links</h3><p>Instantly convert long URLs into short shareable links.</p></div>
+<div class="feature"><h3>Custom Aliases</h3><p>Create memorable custom short links for branding.</p></div>
+<div class="feature"><h3>QR Code Generator</h3><p>Generate QR codes for every short link you create.</p></div>
+<div class="feature"><h3>Link Analytics</h3><p>Track clicks, countries, devices and traffic sources.</p></div>
+<div class="feature"><h3>Link-in-Bio Pages</h3><p>Create social bio pages to organize multiple links.</p></div>
+<div class="feature"><h3>Campaign Management</h3><p>Group and manage links inside marketing campaigns.</p></div>
+
+</div>
+
+</section>
+
+<section class="section faq">
+
+<h2>Frequently Asked Questions</h2>
+
+<div class="card">
+<button>What is a URL shortener?<span>+</span></button>
+<div class="toggle_body">
+A URL shortener converts a long web address into a short link that redirects to the original page.
+</div>
+</div>
+
+<div class="card">
+<button>Is this URL shortener free?<span>+</span></button>
+<div class="toggle_body">
+Yes, Trimd.cc allows you to shorten unlimited links for free.
+</div>
+</div>
+
+<div class="card">
+<button>Why use short links?<span>+</span></button>
+<div class="toggle_body">
+Short links are easier to share, look cleaner in posts, and allow click tracking and analytics.
+</div>
+</div>
+
+</section>
+
+</main>
+
+<footer>
+© 2026 Trimd – <a href="https://briceka.com/trimd" style="color:#00f0ff">trimd.cc</a>
+</footer>
+
+<script>
+
+const iframe=document.getElementById("trimd-embed")
+
+window.addEventListener("message",function(e){
+
+if(e.origin!=="https://s.trimd.cc")return
+
+if(e.data.type==="resize"){
+iframe.style.height=e.data.height+"px"
+}
+
+})
+
+document.querySelectorAll(".faq button").forEach(btn=>{
+btn.onclick=()=>{
+btn.parentElement.classList.toggle("show")
+}
+})
+
+</script>
+
+<script type="application/ld+json">
+{
+"@context":"https://schema.org",
+"@type":"SoftwareApplication",
+"name":"Trimd URL Shortener",
+"applicationCategory":"WebApplication",
+"operatingSystem":"Any",
+"url":"https://trimd.cc",
+"description":"Free URL shortener that converts long links into short shareable URLs.",
+"offers":{
+"@type":"Offer",
+"price":"0",
+"priceCurrency":"USD"
+}
+}
+</script>
+
+<script type="application/ld+json">
+{
+"@context":"https://schema.org",
+"@type":"FAQPage",
+"mainEntity":[
+{
+"@type":"Question",
+"name":"What is a URL shortener?",
+"acceptedAnswer":{"@type":"Answer","text":"A URL shortener converts a long web address into a short link that redirects to the original page."}
+},
+{
+"@type":"Question",
+"name":"Is this URL shortener free?",
+"acceptedAnswer":{"@type":"Answer","text":"Yes, Trimd allows unlimited free link shortening."}
+}
+]
+}
+</script>
+
+<script>
+lucide.createIcons();
+
+function switchTab(id) {
+document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('bg-blue-600'));
+document.querySelectorAll('.tab-btn').forEach(b => b.classList.add('bg-slate-800'));
+
+document.getElementById(id).classList.add('active');
+event.currentTarget.classList.remove('bg-slate-800');
+event.currentTarget.classList.add('bg-blue-600');
+}
+
+async function shortenLink() {
+const urlInput = document.getElementById('longUrl');
+const btn = document.getElementById('btnText');
+const resultArea = document.getElementById('resultArea');
+const shortResult = document.getElementById('shortResult');
+
+if(!urlInput.value) return notify("Please enter a URL","error");
+
+btn.disabled = true;
+btn.innerHTML = "Shortening...";
+
+try {
+const response = await fetch('/tools/trimd/process.php', {
+method: 'POST',
+headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+body: 'url=' + encodeURIComponent(urlInput.value)
+});
+const data = await response.json();
+
+if(data.shorturl) {
+resultArea.classList.remove('hidden');
+shortResult.innerText = data.shorturl;
+} else {
+notify(data.message,"error");
+}
+} catch (e) {
+notify("Server error. Use the alternative below(Trimd Terminal) ","error");
+} finally {
+btn.disabled = false;
+btn.innerHTML = 'Shorten <i data-lucide="zap" class="w-5 h-5"></i>';
+lucide.createIcons();
+}
+}
+
+function copyResult() {
+const text = document.getElementById('shortResult').innerText;
+navigator.clipboard.writeText(text);
+notify("Copied to clipboard!","success");
+}
+
+function notify(message, type = "info") {
+const box = document.getElementById("notify");
+const text = document.getElementById("notifyText");
+
+text.innerText = message;
+
+text.classList.remove(
+"border-red-500","border-green-500","border-blue-500"
+);
+
+if(type === "error"){
+text.classList.add("border","border-red-500");
+} else if(type === "success"){
+text.classList.add("border","border-green-500");
+} else {
+text.classList.add("border","border-blue-500");
+}
+
+box.classList.remove("hidden");
+
+setTimeout(() => {
+box.classList.add("hidden");
+}, 4000);
+}
+</script>
+
 </body>
 </html>

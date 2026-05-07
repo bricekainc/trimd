@@ -1,19 +1,3 @@
-<?php
-require_once 'config.php';
-
-// Fetch Data for Tables
-function getLinks($pdo, $order, $limit = 10) {
-$stmt = $pdo->prepare("SELECT alias, url, click, date FROM url WHERE public = 1 AND archived = 0 ORDER BY $order LIMIT $limit");
-$stmt->execute();
-return $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
-
-$topLinks = getLinks($pdo, 'click DESC');
-$newLinks = getLinks($pdo, 'date DESC');
-$inactive = getLinks($pdo, 'click ASC');
-?>
-<!DOCTYPE html>
-
 <html lang="en">
 <head>
 
@@ -28,12 +12,12 @@ $inactive = getLinks($pdo, 'click ASC');
 
 <meta name="robots" content="index,follow">
 
-<link rel="canonical" href="https://briceka.com/trimd">
+<link rel="canonical" href="https://bricekainc.github.io/trimd">
 
 <meta property="og:type" content="website">
 <meta property="og:title" content="Free URL Shortener – Shorten Links Instantly">
 <meta property="og:description" content="Shorten long links instantly with Trimd.cc free URL shortener. Create short links, QR codes and track link performance.">
-<meta property="og:url" content="https://briceka.com/trimd">
+<meta property="og:url" content="https://bricekainc.github.io/trimd">
 <meta property="og:image" content="https://briceka.com/tools/trimd/trimd.png">
 
 <meta name="twitter:card" content="summary_large_image">
@@ -389,7 +373,7 @@ Short links are easier to share, look cleaner in posts, and allow click tracking
 </main>
 
 <footer>
-© 2026 Trimd – <a href="https://briceka.com/trimd" style="color:#00f0ff">trimd.cc</a>
+© 2026 Trimd – <a href="https://bricekainc.github.io/trimd" style="color:#00f0ff">trimd.cc</a>
 </footer>
 
 <script>

@@ -1,3 +1,5 @@
+<!DOCTYPE html>
+
 <html lang="en">
 <head>
 
@@ -12,12 +14,12 @@
 
 <meta name="robots" content="index,follow">
 
-<link rel="canonical" href="https://bricekainc.github.io/trimd">
+<link rel="canonical" href="https://briceka.com/trimd">
 
 <meta property="og:type" content="website">
 <meta property="og:title" content="Free URL Shortener – Shorten Links Instantly">
 <meta property="og:description" content="Shorten long links instantly with Trimd.cc free URL shortener. Create short links, QR codes and track link performance.">
-<meta property="og:url" content="https://bricekainc.github.io/trimd">
+<meta property="og:url" content="https://briceka.com/trimd">
 <meta property="og:image" content="https://briceka.com/tools/trimd/trimd.png">
 
 <meta name="twitter:card" content="summary_large_image">
@@ -240,6 +242,20 @@ Shorten <i data-lucide="zap" class="w-5 h-5"></i>
 </div>
 </div>
  
+<div class="app-container">
+
+<div class="app-header">
+<div class="dot active"></div>
+<div class="dot"></div>
+<div class="dot"></div>
+<span style="font-size:12px;color:#94a3b8;margin-left:10px">Trimd Terminal // free URL shortener</span>
+</div>
+
+<iframe id="trimd-embed" src="https://s.trimd.cc/" loading="eager" allow="clipboard-write"></iframe>
+
+</div>
+
+
 <section class="max-w-5xl mx-auto px-6 py-12">
 <div class="grid md:grid-cols-2 gap-12 items-center mb-20">
 <div>
@@ -251,7 +267,7 @@ Shorten <i data-lucide="zap" class="w-5 h-5"></i>
 </ol>
 </div>
 <div class="glass p-8 rounded-3xl">
-<h3 class="text-xl font-bold mb-2">Why use our Free URL Shortener</h3>
+<h3 class="text-xl font-bold mb-2">Why use Trimd Link shortener</h3>
 <p class="text-slate-400 text-sm leading-relaxed">
 Our platform provides more than just a shorter link. We offer enterprise-grade redirection speeds, ensuring your users reach their destination without delay. Long, messy URLs can look suspicious and lower click-through rates. By using a clean, professional link, you increase trust and engagement across social media platforms like Instagram, Twitter, and LinkedIn.
 </p>
@@ -325,7 +341,7 @@ Short links are easier to share, look cleaner in posts, and allow click tracking
 </main>
 
 <footer>
-© 2026 Trimd – <a href="https://bricekainc.github.io/trimd" style="color:#00f0ff">trimd.cc</a>
+© 2026 Trimd – <a href="https://briceka.com/trimd" style="color:#00f0ff">trimd.cc</a>
 </footer>
 
 <script>
@@ -425,7 +441,7 @@ shortResult.innerText = data.shorturl;
 notify(data.message,"error");
 }
 } catch (e) {
-notify("Server error. Use the official website, <a href="https://trimd.cc/">Trimd.cc</a> ","error");
+notify("Server error. Use the alternative below(Trimd Terminal), or official website, Trimd.cc ","error");
 } finally {
 btn.disabled = false;
 btn.innerHTML = 'Shorten <i data-lucide="zap" class="w-5 h-5"></i>';
